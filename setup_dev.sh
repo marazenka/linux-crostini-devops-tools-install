@@ -5,8 +5,13 @@ set -e
 
 echo "Updating system and installing base dependencies..."
 sudo apt update
-sudo apt install -y curl gnupg2 software-properties-common unzip git lsb-release
+sudo apt install -y curl gnupg2 software-properties-common unzip git lsb-release python3-pip python3-venv
 sudo mkdir -p -m 755 /etc/apt/keyrings
+
+# 0. Ansible (Official PPA)
+echo "Installing Ansible..."
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt install -y ansible
 
 # 1. Google Cloud CLI
 echo "Installing Google Cloud CLI..."
@@ -39,9 +44,11 @@ echo "Setting up shell aliases for bash and zsh..."
 for RC in "$HOME/.bashrc" "$HOME/.zshrc"; do
     if [ -f "$RC" ]; then
         # Check if aliases already exist to avoid duplicates
-        grep -q "alias docker=podman" "$RC" || echo "alias docker=podman" >> "$RC"
-        grep -q "alias k=kubectl" "$RC" || echo "alias k=kubectl" >> "$RC"
-        grep -q "complete -F __start_kubectl k" "$RC" || echo "complete -F __start_kubectl k" >> "$RC"
+        echo "alias docker=podman" >> "$RC"
+        echo "alias k=kubectl" >> "$RC"
+        echo "alias tg=terragrunt" >> "$RC"
+        echo "alias tf=tofu" >> "$RC"
+        grep -q "kubectl completion" "$RC" || echo 'source <(kubectl completion bash)' >> "$RC"
     fi
 done
 
@@ -51,5 +58,19 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 unzip -q awscliv2.zip
 sudo ./aws/install --update
 rm -rf aws awscliv2.zip
+
+# 6. Helm
+echo "Installing Helm..."
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/refs/heads/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+rm get_helm.sh
+
+# 7. Terragrunt
+echo "Installing Terragrunt..."
+TG_VERSION=$(curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+curl -L "https://github.com/gruntwork-io/terragrunt/releases/download/${TG_VERSION}/terragrunt_linux_amd64" -o terragrunt
+sudo chmod +x terragrunt
+sudo mv terragrunt /usr/local/bin/terragrunt
 
 echo "Installation complete. Please restart your shell or run 'source ~/.bashrc'."
