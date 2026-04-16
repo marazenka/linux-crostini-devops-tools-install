@@ -73,4 +73,11 @@ curl -L "https://github.com/gruntwork-io/terragrunt/releases/download/${TG_VERSI
 sudo chmod +x terragrunt
 sudo mv terragrunt /usr/local/bin/terragrunt
 
+# 8. Azure CLI                                                                                                                                                                                              │
+echo "Installing Azure CLI..."
+curl -sL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /etc/apt/keyrings/microsoft.gpg
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
+sudo apt update
+sudo apt install -y azure-cli
+
 echo "Installation complete. Please restart your shell or run 'source ~/.bashrc'."
