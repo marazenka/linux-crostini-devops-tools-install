@@ -80,4 +80,16 @@ echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://package
 sudo apt update
 sudo apt install -y azure-cli
 
+# 9. OpenStack CLI
+echo "Installing OpenStack CLI..."
+sudo apt install -y python3-pip python3-dev
+sudo pip3 install python-openstackclient --break-system-packages --ignore-installed
+
+# 10. Packer (HashiCorp official repo)
+echo "Installing Packer..."
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/hashicorp.gpg
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update
+sudo apt install -y packer
+
 echo "Installation complete. Please restart your shell or run 'source ~/.bashrc'."
